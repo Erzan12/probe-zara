@@ -4,10 +4,55 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Department {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique
+  employee Employee[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("departments")
+}
+
+model Employee {
+  id        Int   @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String @unique
+  salary    Decimal @db.Decimal(12, 2)
+  bonus     Decimal @default(0) @db.Decimal(12, 2)
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+  logs         TransactionLog[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([departmentId])
+  @@map("employees")
+}
+
+model TransactionLog {
+  id       Int    @id @default(autoincrement())
+  employeeId Int
+  employee Employee @relation(fields: [employeeId], references: [id])
+  amount   Decimal  @db.Decimal(12, 2)
+  type     TransactionType
+  processedBy Int?
+  createdAt DateTime @default(now())
+
+  @@index([employeeId])
+  @@map("transaction_logs") 
+}
+
+enum TransactionType {
+  BONUS_PAYOUT
+  SALARY_ADJUSTMENT
+  DEDUCTION
 }
