@@ -1,7 +1,8 @@
-import { IsInt, IsNotEmpty } from "class-validator";
+import { IsArray, IsInt, IsNotEmpty } from "class-validator";
 
 export class PayBonusDto {
-    @IsInt()
+    @IsInt({ each: true })
+    @IsArray()
     @IsNotEmpty()
     employeeIds!: number[];
 }
