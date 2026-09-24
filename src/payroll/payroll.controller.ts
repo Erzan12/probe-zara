@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Put, UseInterceptors } from '@nestjs/common';
 import { PayrollService } from './payroll.service';
 import { PayBonusDto } from './dto/payroll.dto';
+import { AuditLoggingInterceptor } from 'src/utils/interceptor';
 
 @Controller('payroll')
 export class PayrollController {
@@ -12,6 +13,7 @@ export class PayrollController {
     }
 
     @Put('pay-bonus')
+    @UseInterceptors(AuditLoggingInterceptor)
     payBonuses(@Body() dto: PayBonusDto) {
         return this.payrollService.payBonuses(dto);
     }

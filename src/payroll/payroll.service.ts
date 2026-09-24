@@ -27,24 +27,24 @@ export class PayrollService {
     async payBonuses(dto: PayBonusDto) {
         return this.prisma.$transaction(async (tx) => {
             const employees = await tx.employee.findMany({
-                where: { id: { in: dto.employeeIds }, bonus: { gte: 0} },
+                where: { id: { in: dto.employeeIds }, bonus: { gt: 0} },
             });
 
             for (const emp of employees) {
                 const newSalary = emp.salary.plus(emp.bonus);
 
-                console.log("new salary", newSalary);
+                // console.log("new salary", newSalary);
 
                 await tx.employee.update({
                     where: { id: emp.id },
                     data: { salary: newSalary, bonus: 0 },
                 });
 
-                console.log("emp", emp);
+                // console.log("emp", emp);
 
-                if (emp.id === 9) {
-                    throw new Error('Simulated failure after employee 9 updated');
-                }
+                // if (emp.id === 9) {
+                //     throw new Error('Simulated failure after employee 9 updated');
+                // }
 
                 await tx.transactionLog.create({
                     data: { employeeId: emp.id, amount: emp.bonus, type: 'BONUS_PAYOUT', },
